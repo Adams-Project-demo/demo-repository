@@ -1,0 +1,126 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-ec2-instance
+  title: Create an EC2 Instance on AWS
+  description: Create an instance on AWS to deploy your application
+  tags:
+    - aws
+    - ec2
+    - platform
+
+spec:
+  owner: platform
+  type: resource
+
+  parameters:
+    - title: EC2 Instance Creation
+      required:
+        - instanceName
+        - region
+        - instanceType
+        - action
+      properties:
+        instanceName:
+          title: Instance Name
+          type: string
+
+        region:
+          title: AWS Region
+          type: string
+          description: Name of the region where you want to create your EC2 instance (e.g., us-east-1, ap-south-1)
+
+        instanceType:
+          title: Type of Instance
+          type: string
+          description: Type of the instance to deploy (e.g., t2.medium, t3.micro, etc.)
+          enum:
+            - t3.small
+            - t3.micro
+            - t3.medium
+
+        action:
+          title: Action
+          type: string
+          description: What action do you want to perform? (create or delete)
+          enum:
+            - apply
+            - destroy
+
+    - title: Repository Configuration
+      required:
+        - existingRepoUrl
+        - visibility
+      properties:
+        existingRepoUrl:
+          title: Existing Repository URL
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+           disableRepoCreation: true
+           allowedHosts:
+            - github.com
+           allowedOwners:
+            - Adams-Project-demo
+           allowedRepos:
+            - demo-repository
+          
+          visibility:
+           title: Repository visibility
+           type: string
+           description: visibility of the Repository
+           enum:
+               - public
+
+  steps:
+    - id: debug-inputs
+      name: Debug Inputs
+      action: debug:log
+      input:
+        message: |
+          Dispatching GitHub Action with:
+          Repo URL: ${{ parameters.existingRepoUrl }}
+          Workflow ID: github/workflows/workflow.yml
+          Branch: develop
+          Inputs:
+            instanceName: ${{ parameters.instanceName }}
+            region: ${{ parameters.region }}
+            instanceType: ${{ parameters.instanceType }}
+            action: ${{ parameters.action }}
+
+    - id: github-action
+      name: Starting GitHub Action
+      action: github:actions:dispatch
+      input:
+        workflowId: workflow.yml
+        repoUrl: ${{ parameters.existingRepoUrl }}
+        branch: develop
+        inputs:
+          instanceName: ${{ parameters.instanceName }}
+          region: ${{ parameters.region }}
+          instanceType: ${{ parameters.instanceType }}
+          action: ${{ parameters.action }}
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ parameters.existingRepoUrl }}
+        catalogInfoPath: '/EPH-Test-Develop/AWS_EC2/catalog-info.yaml'
+
+    - id: send-notification
+      name: Send Success Notification
+      action: notifications:send
+      input:
+        title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
+        description: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
+        link: '/catalog/default/component/${{ parameters.instanceName | lower }}'
+        severity: 'normal'
+        topic: 'scaffolder'
+        recipients: 'broadcast'
+
+  output:
+    links:
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
