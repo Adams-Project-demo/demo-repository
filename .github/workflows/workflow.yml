@@ -1,0 +1,58 @@
+name: EC2 Terraform Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      instanceName:
+        description: 'EC2 Instance Name'
+        required: true
+        type: string
+      region:
+        description: 'AWS Region'
+        required: true
+        default: 'us-east-1'
+        type: string
+      instanceType:
+        description: 'EC2 Instance Type'
+        required: true
+        default: 't3.micro'
+        type: string
+      action:
+        description: 'Terraform Action (apply/destroy)'
+        required: true
+        default: 'plan'
+        type: string
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo-repository/AWS_EC2/terraform
+    env:
+      EC2_NAME: ${{ github.event.inputs.instanceName }}
+      REGION: ${{ github.event.inputs.region }}
+      INSTANCE_TYPE: ${{ github.event.inputs.instanceType }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: List Files
+        run: ls -R
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Debug Inputs
+        run: |
+          echo "EC2 Name: ${{ github.event.inputs.instanceName }}"
+          echo "Region: ${{ github.event.inputs.region }}"
+          echo "Instance Type: ${{ github.event.inputs.instanceType }}"
+          echo "Terraform Action: ${{ github.event.inputs.action }}"
+
+      - name: Terraform Init
+        if: ${{ github.event.inputs.tf_action == 'apply' }}
+        run: terraform init
