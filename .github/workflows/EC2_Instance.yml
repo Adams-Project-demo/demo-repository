@@ -34,7 +34,7 @@ on:
 
 jobs:
   terraform:
-    runs-on: [self-hosted, linux, ubuntu-latest]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./AWS_EC2/terraform
