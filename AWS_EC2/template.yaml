@@ -112,7 +112,7 @@ spec:
       name: Starting GitHub Action
       action: github:actions:dispatch
       input:
-        workflowId: .github/workflows/workflow.yml
+        workflowId: .github/workflows/EC2_Instance.yml
         repoUrl: ${{ parameters.existingRepoUrl }}
         branchOrTagName: main
         workflowInputs:
