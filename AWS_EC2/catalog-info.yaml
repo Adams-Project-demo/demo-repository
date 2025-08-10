@@ -1,19 +1,19 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "{{ cookiecutter.instanceName }}"
+  name: '{{ cookiecutter.instanceName }}'
   description: EC2 instance provisioned using Backstage scaffolder
   annotations:
     github.com/project-slug: "{{ cookiecutter.destination.owner + '/' + cookiecutter.destination.repo }}"
     backstage.io/techdocs-ref: dir:.
-    backstage.io/kubernetes-id: "{{ cookiecutter.instanceName }}"
+    backstage.io/kubernetes-id: '{{ cookiecutter.instanceName }}'
     github.com/workflows: 'EC2_Instance.yml'
     # sonarqube.org/project-key: {{ cookiecutter.instance_name }}
   tags:
     - aws
     - ec2
-    - "{{ cookiecutter.region }}"
-    - "{{ cookiecutter.instanceType }}"
+    - '{{ cookiecutter.region }}'
+    - '{{ cookiecutter.instanceType }}'
     - infrastructure
   links:
     - url: https://github.com/{{ cookiecutter.destination.owner }}/{{ cookiecutter.destination.repo }}
@@ -31,4 +31,3 @@ spec:
   dependsOn: []
   providesApis: []
   consumesApis: []
-
