@@ -120,8 +120,8 @@ spec:
       input:
         workflowId: .github/workflows/workflow.yml
         repoUrl: ${{ parameters.existingRepoUrl }}
-        branch: main
-        inputs:
+        branchOrTagName: main
+        workflowInputs:
           instanceName: ${{ parameters.instanceName }}
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
