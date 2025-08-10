@@ -129,9 +129,9 @@ spec:
     #     repoContentsUrl: ${{ parameters.existingRepoUrl }}
     #     catalogInfoPath: '/EPH-Test-Develop/AWS_EC2/catalog-info.yaml'
 
-    - id: send-notification
+    - id: notify
       name: Send Success Notification
-      action: notifications:send
+      action: notification:send
       input:
         title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
         description: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
