@@ -1,0 +1,198 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: Python_Lambda_Container
+  title: Python Hello World Lambda Container
+  description: Create a Python Lambda function in a container image
+  tags:
+    - python
+    - lambda
+    - container
+    - aws
+    - ec2
+    - platform
+
+spec:
+  owner: platform
+  type: service
+
+  parameters:
+
+    - title: Project Configuration
+      required:
+        - project_name
+        - function_name
+      properties:
+        project_name:
+          title: Project Name
+          type: string
+          description: Name of the project (e.g., my-python-lambda)
+          pattern: '^[a-zA-Z0-9-_]+$'
+          ui:help: 'Use alphanumeric characters, hyphens, or underscores.'
+          default: python-hello-lambda
+
+        function_name:
+          title: Lambda Function Name
+          type: string
+          description: Name of the Lambda function (e.g., myLambdaFunction)
+          pattern: '^[a-zA-Z0-9-_]+$'
+          ui:help: 'Use alphanumeric characters, hyphens, or underscores.'
+          default: 'myLambdaFunction'
+
+    - title: AWS Configuration
+      required:
+        - aws_region
+      properties:
+        aws_region:
+          title: AWS Region
+          type: string
+          description: AWS region where the Lambda function will be deployed (e.g., us-east-1)
+          pattern: '^[a-zA-Z0-9-_]+$'
+          ui:help: 'Use alphanumeric characters, hyphens, or underscores.'
+          default: 'us-east-1'
+          enum:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - eu-west-1
+            - eu-west-2
+            - eu-central-1
+            - ap-southeast-1
+            - ap-southeast-2
+            - ap-northeast-1
+            - ap-northeast-2
+          enumNames:
+            - US East (N. Virginia)
+            - US East (Ohio)
+            - US West (N. California)
+            - US West (Oregon)
+            - Asia Pacific (Mumbai)
+            - Europe (Ireland)
+            - Europe (London)
+            - Europe (Frankfurt)
+            - Asia Pacific (Singapore)
+            - Asia Pacific (Sydney)
+            - Asia Pacific (Tokyo)
+            - Asia Pacific (Seoul)
+      
+    - title: Lambda Configuration
+      properties:
+        memory_size:
+          title: Memory Size (MB)
+          type: integer
+          description: Memory size allocated to the Lambda function (e.g., 128, 256, 512)
+          default: 512
+          minimum: 128
+          maximum: 10240
+
+        timeout:
+          title: Timeout (seconds)
+          type: integer
+          description: Maximum execution time for the Lambda function in seconds (e.g., 3, 5, 10)
+          default: 30
+          minimum: 1
+          maximum: 900
+
+        ecr_repository_name:
+          title: ECR Repository Name
+          type: string
+          description: Name of the ECR repository where the container image will be stored (e.g., my-python-lambda)
+          pattern: '^[a-zA-Z0-9-_]+$'
+          ui:help: 'Use alphanumeric characters, hyphens, or underscores.'
+
+
+    - title: Repository Configuration
+      required:
+        - existingRepoUrl
+        - visibility
+      properties:
+        existingRepoUrl:
+          description: URL of the existing repository
+          title: Existing Repository URL
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+           disableRepoCreation: true
+           allowedHosts:
+            - github.com
+           allowedOwners:
+            - Adams-Project-demo
+           allowedRepos:
+            - demo-repository
+        visibility:
+         title: Repository visibility
+         type: string
+         description: visibility of the Repository
+         enum:
+          - public
+          - private
+
+  steps:
+    - id: fetch
+      name: Fetch Template
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          projectName: ${{ parameters.project_name }}
+          functionName: ${{ parameters.function_name }}
+          description: ${{ parameters.description }}
+          awsRegion: ${{ parameters.aws_region }}
+          memorySize: ${{ parameters.memory_size }}
+          timeout: ${{ parameters.timeout }}
+          ecrRepositoryName: ${{ parameters.ecr_repository_name }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
+
+    - id: Publish
+      name: Starting GitHub Action
+      action: github:actions:dispatch
+      input:
+        workflowId: .github/workflows/Simple_python_Lambda.yml
+        repoUrl: ${{ parameters.existingRepoUrl }}
+        branchOrTagName: main
+        workflowInputs:
+          instanceName: ${{ parameters.instanceName }}
+          region: ${{ parameters.region }}
+          instanceType: ${{ parameters.instanceType }}
+          ami_id: ${{ parameters.ami_id }}
+          action: ${{ parameters.action }}
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'.output.repoContentsUrl] }}
+        catalogInfoPath: 'catalog-info.yaml'
+
+    - id: notify
+      name: Send Success Notification
+      action: notification:send
+      input:
+        title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
+        info: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
+        link: '{{repoUrl parameters.existingRepoUrl }}/actions'
+        severity: 'normal'
+        topic: 'scaffolder'
+        recipients: 'broadcast'
+
+  output:
+    links:
+      - title: Repository
+        icon: github
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
+      - title: View in GitHub Actions
+        icon: github
+        url: 'https://github.com/Adams-Project-demo/demo-repository/actions'
+      - title: AWS Console - EC2
+        icon: aws
+        url: 'https://console.aws.amazon.com/'
+      # - title: Open in catalog
+      #   icon: catalog
+      #   entityRef: ${{ steps['register'].output.entityRef }}
+
+
