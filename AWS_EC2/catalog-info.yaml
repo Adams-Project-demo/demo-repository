@@ -4,9 +4,9 @@ metadata:
   name: My First Component
   description: EC2 instance provisioned using Backstage scaffolder
   annotations:
-    github.com/project-slug: {{ cookiecutter.destination.owner + '/' + cookiecutter.destination.repo }}
+    github.com/project-slug: "{{ cookiecutter.destination.owner + '/' + cookiecutter.destination.repo }}"
     backstage.io/techdocs-ref: dir:.
-    backstage.io/kubernetes-id: {{ cookiecutter.instanceName }}
+    backstage.io/kubernetes-id: "{{ cookiecutter.instanceName }}"
     github.com/workflows: 'EC2_Instance.yml'
     # sonarqube.org/project-key: {{ cookiecutter.instance_name }}
   tags:
