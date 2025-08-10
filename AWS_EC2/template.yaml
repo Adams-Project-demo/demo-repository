@@ -57,12 +57,6 @@ spec:
           default: 'ami-08a6efd148b1f7504'
           pattern: '^ami-[a-z0-9]{8,17}$'
 
-        assign_public_ip:
-          title: Assign Public IP
-          type: boolean
-          description: Whether to assign a public IP address to the instance
-          default: true
-
         action:
           title: Action
           type: string
@@ -126,7 +120,6 @@ spec:
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
           ami_id: ${{ parameters.ami_id }}
-          assign_public_ip: "${{ parameters.assign_public_ip }}"
           action: ${{ parameters.action }}
 
     # - id: register

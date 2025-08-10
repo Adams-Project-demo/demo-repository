@@ -18,8 +18,8 @@ variable "instanceType" {
   type        = string
 }
 
-variable "assign_public_ip" {
-  description = "Whether to assign a public IP address to the instance"
-  type        = bool
-  default     = true
-}
+# variable "assign_public_ip" {
+#   description = "Whether to assign a public IP address to the instance"
+#   type        = bool
+#   default     = true
+# }
