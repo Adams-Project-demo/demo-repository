@@ -1,7 +1,6 @@
 name: EC2 Terraform Workflow
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       instanceName:

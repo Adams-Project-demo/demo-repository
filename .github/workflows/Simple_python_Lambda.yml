@@ -1,9 +1,6 @@
 name: Python Lambda Container Workflow
 
 on:
-    push:
-        branches:
-            - main
     workflow_dispatch:
         inputs:
             function_name:
