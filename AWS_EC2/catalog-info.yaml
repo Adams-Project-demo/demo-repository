@@ -12,8 +12,8 @@ metadata:
   tags:
     - aws
     - ec2
-    - {{ cookiecutter.region }}
-    - {{ cookiecutter.instanceType }}
+    - "{{ cookiecutter.region }}"
+    - "{{ cookiecutter.instanceType }}"
     - infrastructure
   links:
     - url: https://github.com/{{ cookiecutter.destination.owner }}/{{ cookiecutter.destination.repo }}
