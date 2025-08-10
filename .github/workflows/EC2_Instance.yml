@@ -17,6 +17,15 @@ on:
         required: true
         default: 't3.micro'
         type: string
+      ami_id:
+        description: 'AMI ID for the EC2 Instance'
+        required: true
+        type: string
+      assign_public_ip:
+        description: 'Assign Public IP to the EC2 Instance'
+        required: false
+        default: true
+        type: boolean
       action:
         description: 'Terraform Action (apply/destroy)'
         required: true
@@ -25,34 +34,62 @@ on:
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, ubuntu-latest]
     defaults:
       run:
-        working-directory: demo-repository/AWS_EC2/terraform
+        working-directory: ./AWS_EC2/terraform
     env:
-      EC2_NAME: ${{ github.event.inputs.instanceName }}
-      REGION: ${{ github.event.inputs.region }}
-      INSTANCE_TYPE: ${{ github.event.inputs.instanceType }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_instanceName: ${{ inputs.instanceName }}
+      TF_VAR_region: ${{ inputs.region }}
+      TF_VAR_instanceType: ${{ inputs.instanceType }}
+      TF_VAR_ami_id: ${{ inputs.ami_id }}
+      TF_VAR_assign_public_ip: ${{ inputs.assign_public_ip }}
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: List Files
-        run: ls -R
+        uses: actions/checkout@v3
+        with:
+          ref: 'main'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
 
-      - name: Debug Inputs
+      - name: Log Terraform Configuration
         run: |
-          echo "EC2 Name: ${{ github.event.inputs.instanceName }}"
-          echo "Region: ${{ github.event.inputs.region }}"
-          echo "Instance Type: ${{ github.event.inputs.instanceType }}"
-          echo "Terraform Action: ${{ github.event.inputs.action }}"
+          echo "Terraform Configuration:"
+          echo "Instance Name: ${{ inputs.instanceName }}"
+          echo "Region: ${{ inputs.region }}"
+          echo "Instance Type: ${{ inputs.instanceType }}"
+          echo "AMI ID: ${{ inputs.ami_id }}"
+          echo "Assign Public IP: ${{ inputs.assign_public_ip }}"
+          echo "Action: ${{ inputs.action }}"
+          echo "====================================="
+      
+      - name: Log working directory
+        run: |
+          echo "Working Directory: ${pwd}"
+          echo "Files and Directories:"
+          ls -la
+          echo "Terraform Files:"
+          find . -name "*.tf" -o -name "*.tfvars" | head -10
 
-      - name: Terraform Init
-        if: ${{ github.event.inputs.tf_action == 'apply' }}
+      - name: Initialize Terraform
+        if: ${{ inputs.action == 'apply'}}
         run: terraform init
+
+      - name: Terraform Plan
+        if: ${{ inputs.action == 'apply' }}
+        run: terraform plan 
+
+      - name: Terraform Apply
+        if: ${{ inputs.action == 'apply' }}
+        run: terraform apply -auto-approve
+
+      - name: Terraform Destroy
+        if: ${{ inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve
