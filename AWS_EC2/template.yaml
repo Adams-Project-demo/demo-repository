@@ -91,12 +91,12 @@ spec:
            allowedRepos:
             - demo-repository
           
-          visibility:
-           title: Repository visibility
-           type: string
-           description: visibility of the Repository
-           enum:
-               - public
+        visibility:
+        title: Repository visibility
+        type: string
+        description: visibility of the Repository
+        enum:
+          - public
 
   steps:
     # - id: debug-inputs
