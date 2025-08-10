@@ -7,8 +7,8 @@ metadata:
     github.com/project-slug: {{ cookiecutter.destination.owner + '/' + cookiecutter.destination.repo }}
     backstage.io/techdocs-ref: dir:.
     backstage.io/kubernetes-id: {{ cookiecutter.instanceName }}
-    github.com/workflows: workflow.yml
-    sonarqube.org/project-key: {{ cookiecutter.instance_name }}
+    github.com/workflows: 'EC2_Instance.yml'
+    # sonarqube.org/project-key: {{ cookiecutter.instance_name }}
   tags:
     - aws
     - ec2

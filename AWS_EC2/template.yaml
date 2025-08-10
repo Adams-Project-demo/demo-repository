@@ -12,23 +12,49 @@ metadata:
 spec:
   owner: platform
   type: resource
-
   parameters:
     - title: EC2 Instance Creation
       required:
         - instanceName
         - region
         - instanceType
+        - ami_id
         - action
       properties:
         instanceName:
           title: Instance Name
           type: string
+          description: Name of the EC2 instance you want to create (e.g., my-ec2-instance)
+          ui:autoFocus: true
+          ui:options:
+            row: 5
 
         region:
           title: AWS Region
           type: string
           description: Name of the region where you want to create your EC2 instance (e.g., us-east-1, ap-south-1)
+          enum:
+            - us-east-1
+            - us-west-2
+            - ap-south-1
+            - eu-west-1
+            - eu-central-1
+            - ap-northeast-1
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - cn-north-1
+            - cn-northwest-1
+            - eu-west-2
+            - eu-west-3
+            - eu-north-1
+            - sa-east-1
+            - us-east-2
+            - us-gov-east-1
+            - us-gov-west-1
+            - us-west-1
+            - us-west-2
+            - us-gov-west-1
 
         instanceType:
           title: Type of Instance
@@ -38,6 +64,20 @@ spec:
             - t3.small
             - t3.micro
             - t3.medium
+            - t3.large
+
+        ami_id:
+          title: AMI ID
+          type: string
+          description: ID of the AMI to use for the instance
+          default: 'ami-08a6efd148b1f7504'
+          pattern: '^ami-[a-z0-9]{8,17}$'
+
+        assign_public_ip:
+          title: Assign Public IP
+          type: boolean
+          description: Whether to assign a public IP address to the instance
+          default: true
 
         action:
           title: Action
@@ -46,6 +86,7 @@ spec:
           enum:
             - apply
             - destroy
+          default: apply
 
     - title: Repository Configuration
       required:
@@ -53,6 +94,7 @@ spec:
         - visibility
       properties:
         existingRepoUrl:
+          description: URL of the existing repository
           title: Existing Repository URL
           type: string
           ui:field: RepoUrlPicker
@@ -73,40 +115,42 @@ spec:
                - public
 
   steps:
-    - id: debug-inputs
-      name: Debug Inputs
-      action: debug:log
-      input:
-        message: |
-          Dispatching GitHub Action with:
-          Repo URL: ${{ parameters.existingRepoUrl }}
-          Workflow ID: github/workflows/workflow.yml
-          Branch: develop
-          Inputs:
-            instanceName: ${{ parameters.instanceName }}
-            region: ${{ parameters.region }}
-            instanceType: ${{ parameters.instanceType }}
-            action: ${{ parameters.action }}
+    # - id: debug-inputs
+    #   name: Debug Inputs
+    #   action: debug:log
+    #   input:
+    #     message: |
+    #       Dispatching GitHub Action with:
+    #       Repo URL: ${{ parameters.existingRepoUrl }}
+    #       Workflow ID: github/workflows/workflow.yml
+    #       Branch: develop
+    #       Inputs:
+    #         instanceName: ${{ parameters.instanceName }}
+    #         region: ${{ parameters.region }}
+    #         instanceType: ${{ parameters.instanceType }}
+    #         action: ${{ parameters.action }}
 
     - id: github-action
       name: Starting GitHub Action
       action: github:actions:dispatch
       input:
-        workflowId: workflow.yml
+        workflowId: .github/workflows/workflow.yml
         repoUrl: ${{ parameters.existingRepoUrl }}
-        branch: develop
+        branch: main
         inputs:
           instanceName: ${{ parameters.instanceName }}
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
+          ami_id: ${{ parameters.ami_id }}
+          assign_public_ip: ${{ parameters.assign_public_ip }
           action: ${{ parameters.action }}
 
-    - id: register
-      name: Register
-      action: catalog:register
-      input:
-        repoContentsUrl: ${{ parameters.existingRepoUrl }}
-        catalogInfoPath: '/EPH-Test-Develop/AWS_EC2/catalog-info.yaml'
+    # - id: register
+    #   name: Register
+    #   action: catalog:register
+    #   input:
+    #     repoContentsUrl: ${{ parameters.existingRepoUrl }}
+    #     catalogInfoPath: '/EPH-Test-Develop/AWS_EC2/catalog-info.yaml'
 
     - id: send-notification
       name: Send Success Notification
@@ -114,13 +158,21 @@ spec:
       input:
         title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
         description: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
-        link: '/catalog/default/component/${{ parameters.instanceName | lower }}'
+        link: '{{repoUrl parameters.existingRepoUrl }}/actions'
         severity: 'normal'
         topic: 'scaffolder'
         recipients: 'broadcast'
 
   output:
     links:
-      - title: Open in catalog
-        icon: catalog
-        entityRef: ${{ steps['register'].output.entityRef }}
+      - title: View in GitHub Actions
+        icon: github
+        url: 'https://github.com/Adams-Project-demo/demo-repository/actions'
+      - title: AWS Console - EC2
+        icon: aws
+        url: 'https://console.aws.amazon.com/ec2/v2/home?region={{parameters.region}}#Instances:instanceId={{parameters.instanceId}}'
+      # - title: Open in catalog
+      #   icon: catalog
+      #   entityRef: ${{ steps['register'].output.entityRef }}
+
+

@@ -3,6 +3,11 @@ variable "instanceName" {
   type        = string
 }
 
+variable "ami_id" {
+  description = "AMI ID for the EC2 instance"
+  type        = string
+}
+
 variable "region" {
   description = "AWS Region"
   type        = string
@@ -11,5 +16,10 @@ variable "region" {
 variable "instanceType" {
   description = "Instance Type"
   type        = string
-  default     = "t2.micro"
+}
+
+variable "assign_public_ip" {
+  description = "Whether to assign a public IP address to the instance"
+  type        = bool
+  default     = true
 }
