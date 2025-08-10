@@ -80,7 +80,7 @@ jobs:
           find . -name "*.tf" -o -name "*.tfvars" | head -10
 
       - name: Initialize Terraform
-        if: ${{ inputs.action == 'apply'}}
+        if: ${{ inputs.action == 'apply' || inputs.action == 'destroy' }}
         run: terraform init
 
       - name: Terraform Plan
