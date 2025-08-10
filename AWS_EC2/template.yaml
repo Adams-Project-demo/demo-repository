@@ -134,7 +134,7 @@ spec:
       action: notification:send
       input:
         title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
-        description: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
+        info: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
         link: '{{repoUrl parameters.existingRepoUrl }}/actions'
         severity: 'normal'
         topic: 'scaffolder'
