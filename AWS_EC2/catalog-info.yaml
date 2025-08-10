@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: My First Component
+  name: "{{ cookiecutter.instanceName }}"
   description: EC2 instance provisioned using Backstage scaffolder
   annotations:
     github.com/project-slug: "{{ cookiecutter.destination.owner + '/' + cookiecutter.destination.repo }}"
