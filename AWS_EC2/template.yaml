@@ -92,14 +92,14 @@ spec:
             - demo-repository
           
         visibility:
-        title: Repository visibility
-        type: string
-        description: visibility of the Repository
-        enum:
+         title: Repository visibility
+         type: string
+         description: visibility of the Repository
+         enum:
           - public
 
   steps:
-    # - id: debug-inputs
+    # - id: debug-inputs 
     #   name: Debug Inputs
     #   action: debug:log
     #   input:
