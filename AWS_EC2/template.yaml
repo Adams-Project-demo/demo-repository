@@ -126,7 +126,7 @@ spec:
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
           ami_id: ${{ parameters.ami_id }}
-          assign_public_ip: ${{ parameters.assign_public_ip }}
+          assign_public_ip: "${{ parameters.assign_public_ip }}"
           action: ${{ parameters.action }}
 
     # - id: register
