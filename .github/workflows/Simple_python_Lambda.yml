@@ -45,6 +45,7 @@ jobs:
             FUNCTION_NAME: ${{ inputs.function_name }}
             MEMORY_SIZE: ${{ inputs.memory_size }}
             TIMEOUT: ${{ inputs.timeout }}
+            ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             ECR_REPOSITORY: backstage/python-lambda
             IMAGE_NAME: python-hello-world-lambda
             
