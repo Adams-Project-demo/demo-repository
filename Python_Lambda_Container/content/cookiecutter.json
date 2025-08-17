@@ -1,0 +1,9 @@
+{
+    "project_name": "Python Lambda Container",
+    "function_name": "lambda_function",
+    "aws_region": "us-east-1",
+    "memory_size": "512",
+    "timeout": "30",
+    "description": "A simple AWS Lambda function using Python in a container",
+    "ecr_repository_name":"backstage-python-lambda-container"
+}
