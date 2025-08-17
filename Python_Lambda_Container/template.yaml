@@ -136,6 +136,8 @@ spec:
       name: Starting GitHub Action
       action: publish:github
       input:
+        allowedHosts: github.com
+        allowedOwners: Adams-Project-demo
         repoUrl: ${{ parameters.repoUrl }}
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         defaultBranch: main
@@ -149,7 +151,7 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: 'catalog-info.yaml'
+        catalogInfoPath: '/catalog-info.yaml'
 
     - id: notify
       name: Send Success Notification
