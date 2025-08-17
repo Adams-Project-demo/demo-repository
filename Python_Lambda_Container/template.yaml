@@ -105,10 +105,10 @@ spec:
 
     - title: Repository Configuration
       required:
-        - existingRepoUrl
+        - repoUrl
         - visibility
       properties:
-        existingRepoUrl:
+        repoUrl:
           description: URL of the existing repository
           title: Existing Repository URL
           type: string
