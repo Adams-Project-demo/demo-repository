@@ -106,7 +106,6 @@ spec:
     - title: Repository Configuration
       required:
         - repoUrl
-        - visibility
       properties:
         repoUrl:
           description: URL of the existing repository
@@ -114,20 +113,10 @@ spec:
           type: string
           ui:field: RepoUrlPicker
           ui:options:
-           disableRepoCreation: true
            allowedHosts:
             - github.com
-           allowedOwners:
+           allowedOrganizations:
             - Adams-Project-demo
-           allowedRepos:
-            - demo-repository
-        visibility:
-         title: Repository visibility
-         type: string
-         description: visibility of the Repository
-         enum:
-          - public
-          - private
 
   steps:
     - id: fetch
@@ -138,28 +127,17 @@ spec:
         values:
           projectName: ${{ parameters.project_name }}
           functionName: ${{ parameters.function_name }}
-          description: ${{ parameters.description }}
           awsRegion: ${{ parameters.aws_region }}
           memorySize: ${{ parameters.memory_size }}
           timeout: ${{ parameters.timeout }}
           ecrRepositoryName: ${{ parameters.ecr_repository_name }}
-          destination: ${{ parameters.repoUrl | parseRepoUrl }}
 
     - id: Publish
       name: Starting GitHub Action
       action: publish:github
       input:
-        allowedHosts:
-          - github.com
-        allowedOrganizations:
-          - Adams-Project-demo
-        description: ${{ parameters.description }}
-        repoUrl: ${{ parameters.repoUrl }}
-        defaultBranch: main
-        visibility: ${{ parameters.visibility }}
-        gitCommitMessage: 'Publishing Python Lambda Function'
-        gitAuthorName: 'Backstage Bot'
-        gitAuthorEmail: 'anthonybreeganzo02@gmail.com'
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: 'catalog-info.yaml'
         
 
     - id: register
@@ -175,7 +153,7 @@ spec:
       input:
         title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
         info: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
-        link: '{{repoUrl parameters.existingRepoUrl }}/actions'
+        link: ${{ steps['publish'].output.remoteUrl }}
         severity: 'normal'
         topic: 'scaffolder'
         recipients: 'broadcast'
