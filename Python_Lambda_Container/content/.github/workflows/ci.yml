@@ -77,18 +77,175 @@ jobs:
                 python3 -m pip install boto3>=1.34.0 --break-system-packages
                 echo "Dependencies installed successfully"
 
-
-
-
-
             - name: Build and Deploy
               run: |
                 echo "Building and deploying the function"
-                python -m pip install --upgrade pip
-                pip install -r requirements.txt
-                python -m pip install awscli --upgrade
-                aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGION.dkr.ecr.$AWS_REGION.amazonaws.com
-                docker build -t $ECR_REPOSITORY/$IMAGE_NAME .
-                docker tag $ECR_RE
+                echo "Using IMAGE_NAME: $IMAGE_NAME"
+                echo "current working directory: $(pwd)"
+                echo "Docker Version: $(docker --version)"
 
-    
+                # Docker Build
+                DOCKER_BUILDKIT=0 docker build -t $IMAGE_NAME .
+                echo "Docker image built successfully"
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Login to AWS ECR
+              id: login-to-ecr
+              uses: aws-actions/amazon-ecr-login@v2
+
+            - name: Create ECR Repository
+              run: |
+                echo "Creating ECR repository if it doesn't exist"
+                aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_REGION || \
+                aws ecr create-repository --repository-name $ECR_REPOSITORY --region $AWS_REGION
+                echo "Repository already exists"
+
+            - name: Tag and Push Docker Image to ECR
+              env:
+                ECR_REGISTRY: ${{ steps.login-to-ecr.outputs.registry }}
+              run: |
+                echo "Tagging and pushing Docker image to ECR"
+                docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest || {
+                echo "Failed to tag Docker image";
+                exit 1;
+                }
+                docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$ECR_REPOSITORY:v1.0 || {
+                echo "Failed to tag Docker image with v1.0";
+                exit 1;
+                }
+
+                echo "Pushing Docker image to ECR"
+                docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest || {
+                echo "Failed to push Docker image to ECR";
+                exit 1;
+                }
+                docker push $ECR_REGISTRY/$ECR_REPOSITORY:v1.0 || {
+                echo "Failed to push Docker image with v1.0 to ECR";
+                exit 1;
+                }
+                echo "Docker image pushed successfully"
+
+            - name: Deploy and update Lambda Function
+              env:
+                ECR_REGISTRY: ${{ steps.login-to-ecr.outputs.registry }}
+              run: |
+                echo "Deploying and updating Lambda function"
+                echo "Using Function Name: $FUNCTION_NAME"
+                echo "Using AWS Region: $AWS_REGION"
+                echo "Using Memory Size: $MEMORY_SIZE"
+                echo "Using Timeout: $TIMEOUT
+
+                # Get AWS Account ID
+                AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+                NAME = "lambda-execution-role"
+                ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}"
+
+                # Check if role exists, create if not
+                if ! aws iam get-role --role-name $ROLE_NAME >/dev/null 2>&1; then
+                  echo "Creating IAM role for Lambda execution"
+
+                  # Create trust policy
+                  cat > trust-policy.json <<EOF
+                  {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Principal": {
+                          "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                      }
+                    ]
+                  }
+                  EOF
+
+                  # Create the role
+                  aws iam create-role --role-name $ROLE_NAME --assume-role-policy-document file://trust-policy.json
+
+                  # Attach basic lambda execution policy
+                  aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+                  # Wait for the role to be created
+                  sleep 10
+
+                  # Clean up the trust policy file
+                  rm trust-policy.json
+
+                  echo " lambda execution role created successfully"
+                else
+                  echo "Lambda execution role already exists"
+                fi
+
+                # Deploy the Lambda function
+                echo "Checking if Lambda function exists: $FUNCTION_NAME"
+
+                if aws lambda get-function --function-name $FUNCTION_NAME --region $AWS_REGION >/dev/null 2>&1; then
+                  echo "Updating existing Lambda function: $FUNCTION_NAME"
+                  
+                  # Update the Lambda function code
+                  aws lambda update-function-code --function-name $FUNCTION_NAME \
+                    --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+                    --region $AWS_REGION
+
+                  # Wait for code update to complete
+                  echo "Waiting for Lambda function code update to complete"
+                  aws lambda wait function-updated --function-name $FUNCTION_NAME --region $AWS_REGION
+
+                  # Update Configuration
+                  aws lambda update-function-configuration --function-name $FUNCTION_NAME \
+                    --memory-size $MEMORY_SIZE \
+                    --timeout $TIMEOUT \
+                    --region $AWS_REGION
+
+                else
+                  echo "Creating new Lambda function: $FUNCTION_NAME"
+
+                  # Create the Lambda function
+                  aws lambda create-function --function-name $FUNCTION_NAME \
+                    --package-type Image \
+                    --code ImageUri=$ECR_REGISTRY/$ECR_REPOSITORY:latest \
+                    --role $ROLE_ARN \
+                    --memory-size $MEMORY_SIZE \
+                    --timeout $TIMEOUT \
+                    --region $AWS_REGION
+                fi
+
+                echo "Lambda function deployed and updated successfully"
+
+            - name: Test Lambda function
+              run: |
+                echo "Testing Lambda function"
+                aws lambda invoke --function-name $FUNCTION_NAME --region $AWS_REGION --log-type Tail test.log
+                cat test.log
+                echo "Lambda function test completed"
+                echo "====================================="
+                echo "Python Lambda Template CI/CD completed successfully"
+                echo "====================================="
+            
+            - name: Cleanup
+              if: always()
+              run: |
+                echo "Cleaning up temporary files"
+                rm -f test.log
+                echo "Cleanup completed"
+                echo "====================================="
+
+            - name: Deployment Summary
+              run: |
+                echo "Deployment Summary:"
+                echo "Function Name: $FUNCTION_NAME"
+                echo "AWS Region: $AWS_REGION"
+                echo "Memory Size: $MEMORY_SIZE MB"
+                echo "Timeout: $TIMEOUT seconds"
+                echo "ECR Repository: $ECR_REPOSITORY"
+                echo "Image Name: $IMAGE_NAME"
+                echo "Deployment completed successfully!"
+
+                
