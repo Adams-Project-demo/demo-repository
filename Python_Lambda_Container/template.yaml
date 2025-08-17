@@ -147,7 +147,7 @@ spec:
 
     - id: Publish
       name: Starting GitHub Action
-      action: Publish:github
+      action: publish:github
       input:
         allowedHosts:
           - github.com
