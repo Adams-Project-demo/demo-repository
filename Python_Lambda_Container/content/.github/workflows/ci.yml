@@ -69,7 +69,7 @@ jobs:
                 echo "Memory Size: $MEMORY_SIZE MB"
                 echo "Timeout: $TIMEOUT seconds"
                 echo "ECR Repository: $ECR_REPOSITORY"
-                echo "Working Directory: $(pwd)
+                echo "Working Directory: $(pwd)"
                 echo "Image Name: $IMAGE_NAME"
 
             - name: Install Dependencies
