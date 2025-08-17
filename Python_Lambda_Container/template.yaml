@@ -105,10 +105,9 @@ spec:
 
     - title: Repository Configuration
       required:
-        - existingRepoUrl
-        - visibility
+        - repoUrl
       properties:
-        existingRepoUrl:
+        repoUrl:
           description: URL of the existing repository
           title: Existing Repository URL
           type: string
@@ -119,8 +118,6 @@ spec:
             - github.com
            allowedOwners:
             - Adams-Project-demo
-           allowedRepos:
-            - demo-repository
         visibility:
          title: Repository visibility
          type: string
@@ -154,7 +151,7 @@ spec:
         allowedOrganizations:
           - Adams-Project-demo
         description: ${{ parameters.description }}
-        repoUrl: ${{ parameters.existingRepoUrl}}
+        repoUrl: ${{ parameters.repoUrl}}
         defaultBranch: main
         visibility: ${{ parameters.visibility }}
         gitCommitMessage: 'Initial commit for Python Lambda Container'
