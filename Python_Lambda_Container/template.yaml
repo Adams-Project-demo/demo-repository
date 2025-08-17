@@ -126,12 +126,12 @@ spec:
       input:
         url: ./content
         values:
-          projectName: ${{ parameters.project_name }}
-          functionName: ${{ parameters.function_name }}
-          awsRegion: ${{ parameters.aws_region }}
-          memorySize: ${{ parameters.memory_size }}
+          project_name: ${{ parameters.project_name }}
+          function_name: ${{ parameters.function_name }}
+          aws_region: ${{ parameters.aws_region }}
+          memory_size: ${{ parameters.memory_size }}
           timeout: ${{ parameters.timeout }}
-          ecrRepositoryName: ${{ parameters.ecr_repository_name }}
+          ecr_repository_name: ${{ parameters.ecr_repository_name }}
 
     - id: publish
       name: Starting GitHub Action
