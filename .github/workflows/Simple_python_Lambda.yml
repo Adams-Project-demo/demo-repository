@@ -47,6 +47,7 @@ jobs:
             ECR_REPOSITORY: backstage/python-lambda
             IMAGE_NAME: python-hello-world-lambda
             
+            
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
@@ -73,8 +74,10 @@ jobs:
                 echo "AWS Region: $AWS_REGION"
                 echo "Memory Size: $MEMORY_SIZE MB"
                 echo "Timeout: $TIMEOUT seconds"
+                echo "ECR_REGISTRY: $ECR_REGISTRY"
                 echo "ECR Repository: $ECR_REPOSITORY"
                 echo "ECR Image Name: $IMAGE_NAME"
+                echo "Full ECR URI would be: $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
             - name: Install Dependencies
               run: |
