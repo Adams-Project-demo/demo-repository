@@ -25,6 +25,11 @@ on:
                 required: true
                 default: '300'
 
+permissions:
+   contents: read
+   id-token: write
+   actions: read
+
 jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
