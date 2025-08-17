@@ -1,6 +1,14 @@
 name: Python Lambda Container Workflow
 
 on:
+    push:
+      branches:
+        - main
+      paths:
+        - 'Python_Lambda_Container/**'
+        - '.github/workflows/Simple_python_Lambda.yml'
+    repository_dispatch:
+        types: [create-backstage-component]
     workflow_dispatch:
         inputs:
             function_name:

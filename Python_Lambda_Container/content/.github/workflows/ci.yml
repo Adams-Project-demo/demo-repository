@@ -1,6 +1,9 @@
 name: Python Lambda Template CI/CD
 
 on:
+    push:
+      branches:
+        - main
     repository_dispatch:
         types: [create-backstage-component]
     workflow_dispatch:
@@ -248,4 +251,3 @@ jobs:
                 echo "Image Name: $IMAGE_NAME"
                 echo "Deployment completed successfully!"
 
-                
