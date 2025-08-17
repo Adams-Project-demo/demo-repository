@@ -136,8 +136,6 @@ spec:
       name: Starting GitHub Action
       action: publish:github
       input:
-        allowedHosts: github.com
-        allowedOwners: Adams-Project-demo
         repoUrl: ${{ parameters.repoUrl }}
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         defaultBranch: main
