@@ -118,8 +118,6 @@ jobs:
                 echo "ECR repository ready"
 
             - name: Tag and Push Docker Image to ECR
-              env:
-                ECR_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}
               run: |
                 echo "Tagging and pushing Docker image to ECR"
                 docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest || {
@@ -144,8 +142,6 @@ jobs:
                 echo "Docker image pushed successfully to ECR"
 
             - name: Deploy or Update Lambda function
-              env:
-                ECR_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}
               run: |
                 echo "Deploying or updating Lambda function"
 
