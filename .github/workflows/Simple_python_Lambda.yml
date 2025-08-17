@@ -30,6 +30,11 @@ on:
                 required: true
                 default: '30'
                 type: string
+            ecr_repository:
+                description: 'ECR Repository Name'
+                required: false
+                default: 'backstage-python-lambda'
+                type: string
 
 jobs:
     build:
@@ -41,12 +46,12 @@ jobs:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-            AWS_REGION: ${{ secrets.AWS_REGION }}
+            AWS_REGION: ${{ inputs.aws_region }}
             FUNCTION_NAME: ${{ inputs.function_name }}
             MEMORY_SIZE: ${{ inputs.memory_size }}
             TIMEOUT: ${{ inputs.timeout }}
-            ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-            ECR_REPOSITORY: backstage/python-lambda
+            ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com
+            ECR_REPOSITORY: ${{ inputs.ecr_repository }}
             IMAGE_NAME: python-hello-world-lambda
             
             
@@ -99,7 +104,7 @@ jobs:
               with:
                 aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                aws-region: ${{ secrets.AWS_REGION }}
+                aws-region: ${{ inputs.aws_region }}
 
             - name: Log in to Amazon ECR
               id: login-ecr
