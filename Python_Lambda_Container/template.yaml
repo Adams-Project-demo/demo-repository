@@ -117,6 +117,17 @@ spec:
             - github.com
            allowedOwners:
             - Adams-Project-demo
+        repoVisibility:
+          title: Repository Visibility
+          description: Visibility of the newly created repository
+          type: string
+          default: public
+          enum:
+            - public
+            - private
+          enumNames:
+            - Public
+            - Private
         
 
   steps:
