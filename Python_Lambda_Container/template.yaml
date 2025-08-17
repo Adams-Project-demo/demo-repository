@@ -132,7 +132,7 @@ spec:
           timeout: ${{ parameters.timeout }}
           ecrRepositoryName: ${{ parameters.ecr_repository_name }}
 
-    - id: Publish
+    - id: publish
       name: Starting GitHub Action
       action: publish:github
       input:
