@@ -147,7 +147,7 @@ jobs:
 
                 echo "Using Function Name: $FUNCTION_NAME"
                 echo "Using Memory Size: $MEMORY_SIZE"
-                echo "Using Timeout: $TIMEOUT
+                echo "Using Timeout: $TIMEOUT"
 
                 # Get AWS Account ID
                 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
@@ -190,7 +190,7 @@ jobs:
                       # Clean up
                       rm trust-policy.json
 
-                      echo " Lambda ececution role created successfully"
+                      echo "Lambda ececution role created successfully"
                 else
                     echo "Role $ROLE_NAME exists. Skipping role creation."
                 fi
