@@ -153,6 +153,7 @@ spec:
         gitCommitMessage: 'Initial commit: Python Lambda Function'
         gitAuthorName: 'Backstage Bot'
         gitAuthorEmail: 'anthonybreeganzo02@gmail.com'
+        repoVisibility: public
         
 
     # - id: register

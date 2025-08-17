@@ -91,6 +91,19 @@ jobs:
                 docker build -t $IMAGE_NAME .
                 echo "Docker image built successfully"
 
+            - name: Verify AWS Secrets
+              run: |
+                if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+                  echo "❌ AWS_ACCESS_KEY_ID is missing"
+                  exit 1
+                fi
+                if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+                  echo "❌ AWS_SECRET_ACCESS_KEY is missing"
+                  exit 1
+                fi
+                echo "✅ AWS credentials are available"
+
+
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v4
               with:
