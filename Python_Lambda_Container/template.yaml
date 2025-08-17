@@ -117,6 +117,14 @@ spec:
             - github.com
            allowedOwners:
             - Adams-Project-demo
+        visibility:
+          title: Repository Visibility
+          type: string
+          description: Visibility of the repository (public or private)
+          enum:
+            - public
+            - private
+          default: public
 
   steps:
     - id: fetch
@@ -138,6 +146,7 @@ spec:
       input:
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
+        visibility: ${{ parameters.visibility }}
         gitCommitMessage: 'Initial commit: Python Lambda Function'
         gitAuthorName: 'Backstage Bot'
         gitAuthorEmail: 'anthonybreeganzo02@gmail.com'
