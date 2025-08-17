@@ -108,8 +108,8 @@ spec:
         - repoUrl
       properties:
         repoUrl:
-          description: URL of the existing repository
-          title: Existing Repository URL
+          description: URL of the newly created repository
+          title: New Repository URL
           type: string
           ui:field: RepoUrlPicker
           ui:options:
@@ -148,8 +148,8 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}/blob/main/catalog-info.yaml
-        catalogInfoPath: ''
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
         # location: ${{ steps.publish.output.remoteUrl }}/blob/main/catalog-info.yaml
 
     - id: notify
@@ -177,8 +177,5 @@ spec:
       - title: AWS Console - EC2
         icon: aws
         url: 'https://console.aws.amazon.com/'
-      # - title: Open in catalog
-      #   icon: catalog
-      #   entityRef: ${{ steps['register'].output.entityRef }}
 
 

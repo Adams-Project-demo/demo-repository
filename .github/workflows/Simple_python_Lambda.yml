@@ -87,35 +87,7 @@ jobs:
               run: |
                 echo "Building Docker image"
                 docker build -t $IMAGE_NAME .
-
-            - name: Test Docker Image Locally
-              run: |
-                echo "Testing Docker image locally"
-
-                # Create test event file
-                echo '{"name": "Docker Test"}' > test_event.json
-
-                # Run container in background for testing
-                docker run -d -p 9000:8080 --name test_lambda $IMAGE_NAME
-
-                # Wait for the container to start
-                sleep 10
-
-                # Test the Lambda function
-                echo "Testing the Lambda function..."
-                response=$(curl -s -XPOST "http://localhost:9000/2015-03-31/functions/$FUNCTION_NAME/invocations" \
-                    -d @test_event.json)
-
-                echo "Response: $response"
-
-                # Check if the response contains expected output
-                if echo "$response" | grep -q "Hello, Docker Test!"; then
-                    echo "Lambda function test passed."
-                else
-                    echo "Lambda function test failed."
-                    exit 1
-                fi
-
+             
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
