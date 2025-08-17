@@ -137,7 +137,6 @@ spec:
       action: publish:github
       input:
         repoUrl: ${{ parameters.repoUrl }}
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         defaultBranch: main
         gitCommitMessage: 'Initial commit: Python Lambda Function'
         gitAuthorName: 'Backstage Bot'
