@@ -1,11 +1,11 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "${{ parameters.project_name }}"
-  title: "${{ parameters.function_name }}"
-  description: "Python Lambda function deployed as container"
+  name: "${{ cookiecutter.project_name }}"
+  title: "${{ cookiecutter.function_name }}"
+  description: "${{ cookiecutter.description }}"
   annotations:
-    github.com/project-slug: "${{ parameters.repoUrl | parseRepoUrl | pick('owner') }}/${{ parameters.repoUrl | parseRepoUrl | pick('repo') }}"
+    github.com/project-slug: "${{ cookiecutter.destination.owner }}/${{ cookiecutter.destination.repo }}"
     backstage.io/techdocs-ref: dir:.
   tags:
     - python
@@ -17,4 +17,4 @@ metadata:
 spec:
   type: service
   lifecycle: experimental
-  owner: "${{ parameters.owner }}"
+  owner: "${{ cookiecutter.destination.owner }}"

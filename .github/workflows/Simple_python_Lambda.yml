@@ -112,22 +112,22 @@ jobs:
               run: |
                 echo "Tagging and pushing Docker image to ECR"
                 docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest || {
-                    echo "Failed to tag Docker image"
-                    exit 1
+                    echo "Failed to tag Docker image";
+                    exit 1;
                 }
                 docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$ECR_REPOSITORY:v1.0 || {
-                    echo "Failed to tag Docker image with version"
-                    exit 1
+                    echo "Failed to tag Docker image with version";
+                    exit 1;
                 }
                 
                 echo "Pushing Docker image to ECR"
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest || {
-                    echo "Failed to push Docker image to ECR"
-                    exit 1
+                    echo "Failed to push Docker image to ECR";
+                    exit 1;
                 }
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY:v1.0 || {
-                    echo "Failed to push Docker image with version to ECR"
-                    exit 1
+                    echo "Failed to push Docker image with version to ECR";
+                    exit 1;
                 }
                 
                 echo "Docker image pushed successfully to ECR"
