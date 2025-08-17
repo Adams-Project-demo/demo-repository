@@ -32,12 +32,12 @@ jobs:
             run:
                 working-directory: .
         env:
-            AWS_REGION: ${{ inputs.aws_region }}
-            FUNCTION_NAME: ${{ inputs.function_name }}
-            MEMORY_SIZE: ${{ inputs.memory_size }}
-            TIMEOUT: ${{ inputs.timeout }}
+            AWS_REGION: ${{ values.aws_region }}
+            FUNCTION_NAME: ${{ values.function_name }}
+            MEMORY_SIZE: ${{ values.memory_size }}
+            TIMEOUT: ${{ values.timeout }}
             ECR_REPOSITORY: backstage-python-lambda
-            IMAGE_NAME: ${{ inputs.function_name }}
+            IMAGE_NAME: ${{ values.function_name }}
 
         steps:
             - name: Checkout repository
@@ -96,7 +96,7 @@ jobs:
               with:
                 aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                 aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                aws-region: ${{ secrets.AWS_REGION }}
+                aws-region: ${{ values.aws_region }}
 
             - name: Login to AWS ECR
               id: login-to-ecr
