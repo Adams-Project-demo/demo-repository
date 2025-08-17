@@ -32,12 +32,12 @@ jobs:
             run:
                 working-directory: .
         env:
-            AWS_REGION: "{{ cookiecutter.aws_region }}"
-            FUNCTION_NAME: "{{ cookiecutter.function_name }}"
-            MEMORY_SIZE: "{{ cookiecutter.memory_size }}"
-            TIMEOUT: "{{ cookiecutter.timeout }}"
-            ECR_REPOSITORY: "{{ cookiecutter.ecr_repository_name }}"
-            IMAGE_NAME: "{{ cookiecutter.project_name }}"
+            AWS_REGION: ${{ inputs.aws_region }}
+            FUNCTION_NAME: ${{ inputs.function_name }}
+            MEMORY_SIZE: ${{ inputs.memory_size }}
+            TIMEOUT: ${{ inputs.timeout }}
+            ECR_REPOSITORY: backstage-python-lambda
+            IMAGE_NAME: "${{ inputs.function_name }}-image"
 
         steps:
             - name: Checkout repository
@@ -88,7 +88,7 @@ jobs:
                 echo "Docker Version: $(docker --version)"
 
                 # Docker Build
-                DOCKER_BUILDKIT=0 docker build -t $IMAGE_NAME .
+                docker build -t $IMAGE_NAME .
                 echo "Docker image built successfully"
 
             - name: Configure AWS Credentials
@@ -146,8 +146,8 @@ jobs:
 
                 # Get AWS Account ID
                 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-                NAME = "lambda-execution-role"
-                ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}"
+                ROLE_NAME = "lambda-execution-role"
+                ROLE_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}"
 
                 # Check if role exists, create if not
                 if ! aws iam get-role --role-name $ROLE_NAME >/dev/null 2>&1; then
