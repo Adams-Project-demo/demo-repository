@@ -159,7 +159,7 @@ jobs:
                     echo "Role $ROLE_NAME does not exist. Creating role..."
                 
                     # Create trust policy
-                    cat > trust-policy.json <<EOF
+                    cat > trust-policy.json << EOF
                     {
                         "Version": "2012-10-17",
                         "Statement": [
