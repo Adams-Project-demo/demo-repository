@@ -144,20 +144,20 @@ spec:
         gitAuthorEmail: 'anthonybreeganzo02@gmail.com'
         
 
-    - id: register
-      name: Register
-      action: catalog:register
-      input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
-        # location: ${{ steps.publish.output.remoteUrl }}/blob/main/catalog-info.yaml
+    # - id: register
+    #   name: Register
+    #   action: catalog:register
+    #   input:
+    #     repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+    #     catalogInfoPath: '/catalog-info.yaml'
+    #     # location: ${{ steps.publish.output.remoteUrl }}/blob/main/catalog-info.yaml
 
     - id: notify
       name: Send Success Notification
       action: notification:send
       input:
-        title: EC2 Instance ${{ parameters.instanceName }} - ${{ parameters.action }} Triggered
-        info: Terraform action "${{ parameters.action }}" triggered for EC2 instance "${{ parameters.instanceName }}"
+        title: Repo Created ${{ parameters.project_name}}
+        info: Python Lambda Function created in ${{ parameters.project_name}}
         link: ${{ steps['publish'].output.remoteUrl }}
         severity: 'normal'
         topic: 'scaffolder'
