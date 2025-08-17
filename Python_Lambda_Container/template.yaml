@@ -37,7 +37,7 @@ spec:
           description: Name of the Lambda function (e.g., myLambdaFunction)
           pattern: '^[a-zA-Z0-9-_]+$'
           ui:help: 'Use alphanumeric characters, hyphens, or underscores.'
-          default: 'myLambdaFunction'
+          default: 'python-lambda'
 
     - title: AWS Configuration
       required:

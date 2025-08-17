@@ -11,7 +11,7 @@ on:
             function_name:
                 description: 'Lambda Function Name'
                 required: true
-                default: 'myLambdaFunction'
+                default: 'python-lambda'
             aws_region:
                 description: 'AWS Region'
                 required: true
@@ -37,7 +37,7 @@ jobs:
             MEMORY_SIZE: ${{ values.memory_size }}
             TIMEOUT: ${{ values.timeout }}
             ECR_REPOSITORY: backstage-python-lambda
-            IMAGE_NAME: ${{ values.function_name }}
+            IMAGE_NAME: python-hello-world-lambda
 
         steps:
             - name: Checkout repository
