@@ -77,7 +77,7 @@ jobs:
                 echo "Timeout: $TIMEOUT seconds"
                 echo "AWS Account ID: $AWS_ACCOUNT_ID"
                 echo "ECR Repository: $ECR_REPOSITORY"
-                cho "ECR_REGISTRY: $ECR_REGISTRY"
+                echo "ECR_REGISTRY: $ECR_REGISTRY"
                 echo "ECR Image Name: $IMAGE_NAME"
                 echo "Full ECR URI would be: $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
