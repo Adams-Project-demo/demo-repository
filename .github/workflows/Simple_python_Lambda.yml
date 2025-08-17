@@ -141,10 +141,10 @@ jobs:
                 
                 echo "Docker image pushed successfully to ECR"
 
-            - name: Deploy or Update Lambda function
+            
+            - name: Create Lambda Function
               run: |
                 echo "Deploying or updating Lambda function"
-
                 echo "Using Function Name: $FUNCTION_NAME"
                 echo "Using Memory Size: $MEMORY_SIZE"
                 echo "Using Timeout: $TIMEOUT"
@@ -155,59 +155,65 @@ jobs:
                 ROLE_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}"
 
                 # Check if role exists, create if not
-                if ! aws iam get-role --role-name $ROLE_NAME > /dev/null 2>&1; then
-                    echo "Role $ROLE_NAME does not exist. Creating role..."
+                if ! aws iam get-role --role-name $ROLE_NAME >/dev/null 2>&1; then
+                  echo "Role $ROLE_NAME does not exist. Creating role..."
                 
-                    # Create trust policy
-                    cat > trust-policy.json << EOF
+                  # Create trust policy
+                  cat > trust-policy.json << EOF
+                {
+                  "Version": "2012-10-17",
+                  "Statement": [
                     {
-                        "Version": "2012-10-17",
-                        "Statement": [
-                            {
-                                "Effect": "Allow",
-                                "Principal": {
-                                    "Service": "lambda.amazonaws.com"
-                                },
-                                "Action": "sts:AssumeRole"
-                            }
-                        ]
+                      "Effect": "Allow",
+                      "Principal": {
+                        "Service": "lambda.amazonaws.com"
+                      },
+                      "Action": "sts:AssumeRole"
                     }
-                    EOF
+                  ]
+                }
+                EOF
 
-                      # Create the role
-                      aws iam create-role \
-                        --role-name $ROLE_NAME \
-                        --assume-role-policy-document file://trust-policy.json
+                  # Create role
+                  aws iam create-role --role-name $ROLE_NAME --assume-role-policy-document file://trust-policy.json
 
-                      # Attach basic Lambda execution policy
-                      aws iam attach-role-policy \
-                        --role-name $ROLE_NAME \
-                        --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+                  # Attach basic Lambda execution policy
+                  aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-                      # Wait for the role to be available
-                      sleep 10
+                  # Wait for the role to be available
+                  echo "Waiting for the role to be available..."
+                  sleep 10
 
-                      # Clean up
-                      rm trust-policy.json
-
-                      echo "Lambda ececution role created successfully"
+                  # Clean up
+                  rm trust-policy.json
+                  echo "Lambda execution role created successfully"
                 else
-                    echo "Role $ROLE_NAME exists. Skipping role creation."
+                  echo "Role $ROLE_NAME exists. Skipping role creation."
                 fi
-                
+
+                #Deploy or update the Lambda function
                 echo "Checking if Lambda function exists..."
-                if aws lambda get-function --function-name $FUNCTION_NAME --region $AWS_REGION > /dev/null 2>&1; then
+                if aws lambda get-function --function-name $FUNCTION_NAME --region $AWS_REGION >/dev/null 2>&1; then
                     echo "Lambda function $FUNCTION_NAME exists. Updating function..."
+                    
+                    #Update the function code
                     aws lambda update-function-code \
                         --function-name $FUNCTION_NAME \
                         --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:latest \
                         --region $AWS_REGION
+                    
+                    #Wait for the update to complete
+                    echo "Waiting for the Lambda function update to complete..."
+                    aws lambda wait function-updated --function-name $FUNCTION_NAME --region $AWS_REGION
+
+                    #Update the function configuration
+                    echo "Updating Lambda function configuration..."
                     aws lambda update-function-configuration \
                         --function-name $FUNCTION_NAME \
                         --memory-size $MEMORY_SIZE \
                         --timeout $TIMEOUT \
-                        --role $ROLE_ARN \
                         --region $AWS_REGION
+
                 else
                     echo "Lambda function $FUNCTION_NAME does not exist. Creating function..."
                     aws lambda create-function \
