@@ -37,7 +37,7 @@ jobs:
             MEMORY_SIZE: ${{ inputs.memory_size }}
             TIMEOUT: ${{ inputs.timeout }}
             ECR_REPOSITORY: backstage-python-lambda
-            IMAGE_NAME: "${{ inputs.function_name }}-image"
+            IMAGE_NAME: ${{ inputs.function_name }}
 
         steps:
             - name: Checkout repository
