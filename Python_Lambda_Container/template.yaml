@@ -115,7 +115,7 @@ spec:
           ui:options:
            allowedHosts:
             - github.com
-           allowedOrganizations:
+           allowedOwners:
             - Adams-Project-demo
 
   steps:
@@ -137,7 +137,10 @@ spec:
       action: publish:github
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: 'catalog-info.yaml'
+        defaultBranch: main
+        gitCommitMessage: 'Initial commit: Python Lambda Function'
+        gitAuthorName: 'Backstage Bot'
+        gitAuthorEmail: 'anthonybreeganzo02@gmail.com'
         
 
     - id: register
