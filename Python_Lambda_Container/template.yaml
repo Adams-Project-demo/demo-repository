@@ -153,6 +153,12 @@ spec:
         repoUrl: ${{ parameters.existingRepoUrl }}
         branchOrTagName: main
         workflowInputs:
+          functionName: ${{ parameters.function_name }}
+          projectName: ${{ parameters.project_name }}
+          awsRegion: ${{ parameters.aws_region }}
+          memorySize: ${{ parameters.memory_size }}
+          timeout: ${{ parameters.timeout }}
+          ecrRepositoryName: ${{ parameters.ecr_repository_name }}
           instanceName: ${{ parameters.instanceName }}
           region: ${{ parameters.region }}
           instanceType: ${{ parameters.instanceType }}
