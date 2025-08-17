@@ -136,6 +136,7 @@ spec:
       name: Starting GitHub Action
       action: publish:github
       input:
+        repoUrl: ${{ parameters.repoUrl }}
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         defaultBranch: main
         gitCommitMessage: 'Initial commit: Python Lambda Function'
