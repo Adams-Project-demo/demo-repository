@@ -147,30 +147,27 @@ spec:
 
     - id: Publish
       name: Starting GitHub Action
-      action: github:actions:dispatch
+      action: Publish:github
       input:
-        workflowId: .github/workflows/Simple_python_Lambda.yml
-        repoUrl: ${{ parameters.existingRepoUrl }}
-        branchOrTagName: main
-        workflowInputs:
-          functionName: ${{ parameters.function_name }}
-          projectName: ${{ parameters.project_name }}
-          awsRegion: ${{ parameters.aws_region }}
-          memorySize: ${{ parameters.memory_size }}
-          timeout: ${{ parameters.timeout }}
-          ecrRepositoryName: ${{ parameters.ecr_repository_name }}
-          instanceName: ${{ parameters.instanceName }}
-          region: ${{ parameters.region }}
-          instanceType: ${{ parameters.instanceType }}
-          ami_id: ${{ parameters.ami_id }}
-          action: ${{ parameters.action }}
+        allowedHosts:
+          - github.com
+        allowedOrganizations:
+          - Adams-Project-demo
+        description: ${{ parameters.description }}
+        repoUrl: ${{ parameters.existingRepoUrl}}
+        defaultBranch: main
+        visibility: ${{ parameters.visibility }}
+        gitCommitMessage: 'Initial commit for Python Lambda Container'
+        gitAuthorName: 'Backstage Scaffolder'
+        gitAuthorEmail: 'anthonybreeganzo02@gmail.com'
+        
 
     - id: register
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'.output.repoContentsUrl] }}
-        catalogInfoPath: 'catalog-info.yaml'
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
 
     - id: notify
       name: Send Success Notification
