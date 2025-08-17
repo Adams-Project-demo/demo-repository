@@ -231,10 +231,10 @@ jobs:
             - name: Clean up
               if: always()
               run: |
-                echo " Cleaning up..."
-                rm trust-policy.json response.json
-                docker image prune -a -f
-                echo "Cleanup completed"
+                echo "Cleaning up temporary files"
+                if [ -f trust-policy.json ]; then
+                    rm trust-policy.json
+                fi
 
             - name: Deployment Summary
               run: |
